@@ -1,0 +1,8 @@
+#!/bin/bash
+# Quartus falso para pruebas: registra la llamada y, al compilar, crea los archivos de salida.
+echo "quartus_sh $*" >> "$FAKE_LOG"
+if [[ " $* " == *" --flow "* ]]; then
+  name="${@: -1}"; mkdir -p output_files; sleep 0.05
+  touch "output_files/$name.pof" "output_files/$name.sof"
+fi
+exit 0

@@ -1,0 +1,35 @@
+# Qué hay que descargar de Altera para esta herramienta. Datos tomados de la página oficial el 2026-10-05.
+# Si Altera republica archivos, actualiza nombres y sha1 aquí (la página los muestra bajo cada descarga).
+version = "25.1std"
+checked = "2026-10-05"
+page = "https://www.altera.com/downloads/fpga-development-tools/quartus-prime-lite-edition-design-software-version-25-1-linux"
+license = "https://altera.widen.net/content/o1u8hrrmmj/original/license-quartus-25.1.zip?u=l5tpmm&download=true"
+min_disk_gb = 14                      # "Quartus Prime Lite Edition Design Software (14 GB)" según la página
+prefix = "~/altera_lite/25.1std"
+
+[[files]]
+name = "QuartusLiteSetup-25.1std.0.1129-linux.run"
+role = "installer"
+size = "1.9 GB"
+sha1 = "ce0773469eacab5b7035c175484625f4ec3737d1"
+what = "Quartus Prime Lite (trae quartus_sh, quartus_pgm y quartus_cpf)"
+
+[[files]]
+name = "cyclone-25.1std.0.1129.qdz"
+role = "device"
+size = "466 MB"
+sha1 = "835d2b1732549294eed625b692d044135499b5e8"
+what = "Soporte de dispositivos Cyclone IV"
+
+[[files]]
+name = "max-25.1std.0.1129.qdz"
+role = "device"
+size = "11.4 MB"
+sha1 = "a3bc065b42a9d005f8d27fe45525411b49c13c43"
+what = "Soporte de dispositivos MAX II y MAX V"
+
+# Instalador oficial recomendado (pequeño): descarga los componentes que elijas. Alternativa a los 3 archivos de arriba.
+[qinst]
+name = "qinst-lite-linux-25.1std-1129.run"
+size = "67.7 MB"
+sha1 = "6738aa50c698b894402cf516b10e4c89f5a50fdf"

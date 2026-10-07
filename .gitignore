@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+
+# Herramientas descargadas con `fpga install-tools` (varios GB): no se suben
+tools/

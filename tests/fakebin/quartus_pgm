@@ -1,0 +1,4 @@
+#!/bin/bash
+echo "quartus_pgm $*" >> "$FAKE_LOG"
+[ -n "$FAKE_PGM_FAIL" ] && exit 2
+exit 0

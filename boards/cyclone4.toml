@@ -1,0 +1,117 @@
+# Tarjeta Cyclone IV E (FPGA). Pines de "Tabla-de-pines.xlsx" y del esquemático.
+id = "cyclone4"
+name = "Cyclone IV E (FPGA)"
+family = "Cyclone IV E"
+device = "EP4CE6E22C8"
+quartus_device = "EP4CE6E22C8"    # nombre que reconoce Quartus
+io_standard = "3.3-V LVTTL"
+default_led = "led1"
+led_active_low = true        # LED activo en bajo: enciende con 0
+assignments = []
+sdc_extra = ["derive_clock_uncertainty"]
+
+[clock]
+mhz = 50
+
+[program]
+mode = "ram_or_flash"
+ram_file = "sof"             # carga por JTAG a la RAM de la FPGA (volátil)
+flash_file = "jic"           # JTAG indirecto: se graba la flash de configuración POR EL MISMO CONECTOR JTAG
+flash_via = "JTAG"
+# Marcadores: {sof} = entrada, {out} = archivo de la flash. `-s` (dispositivo del cargador de flash serial) solo es válido
+# al generar .jic: con .pof, Quartus lo rechaza (Error 213025). SIN VERIFICAR la grabación en la placa; prueba con --dry-run.
+flash_convert = ["quartus_cpf", "-c", "-d", "EPCS16", "-s", "EP4CE6", "{sof}", "{out}"]
+flash_program = ["quartus_pgm", "-m", "jtag", "-o", "p;{out}"]
+flash_note = "La flash se graba por JTAG (.jic): el mismo conector que la RAM, no hace falta cambiar el cable."
+# Alternativa (modo AS, .pof): pasa el USB-Blaster al conector AS (10 pines) y usa
+#   flash_file = "pof";  flash_via = "AS"
+#   flash_convert = ["quartus_cpf", "-c", "-d", "EPCS16", "{sof}", "{out}"]      # sin -s
+#   flash_program = ["quartus_pgm", "-m", "as", "-o", "p;{out}"]
+
+[pins]
+reset = 25
+clk = 23
+dig1 = 133
+dig2 = 135
+dig3 = 136
+key1 = 88
+dig4 = 137
+key2 = 89
+seg0 = 128
+key3 = 90
+seg1 = 121
+key4 = 91
+seg2 = 125
+seg3 = 129
+seg4 = 132
+buzzer = 110
+seg5 = 126
+seg6 = 124
+seg7 = 127
+s_dq0 = 28
+s_dq1 = 30
+s_dq2 = 31
+s_dq3 = 32
+led1 = 87
+s_dq4 = 33
+led2 = 86
+s_dq5 = 34
+led3 = 85
+s_dq6 = 38
+led4 = 84
+s_dq7 = 39
+s_dq8 = 54
+s_dq9 = 53
+uart_txd = 114
+s_dq10 = 52
+uart_rxd = 115
+s_dq11 = 51
+s_dq12 = 50
+s_dq13 = 49
+scl = 112
+s_dq14 = 46
+sda = 113
+s_dq15 = 44
+i2c_scl = 99
+i2c_sda = 98
+s_a0 = 76
+s_a1 = 77
+s_a2 = 80
+ps_clock = 119
+s_a3 = 83
+ps_data = 120
+s_a4 = 68
+s_a5 = 67
+s_a6 = 66
+ir = 100
+s_a7 = 65
+s_a8 = 64
+s_a9 = 60
+s_a10 = 75
+vga_hsync = 101
+s_a11 = 59
+vga_vsync = 103
+vga_b = 104
+sd_bs0 = 73
+vga_g = 105
+sd_bs1 = 74
+vga_r = 106
+sd_ldqm = 42
+sd_udqm = 55
+sd_cke = 58
+lcd_rs = 141
+sd_clk = 43
+lcd_rw = 138
+sd_cs = 72
+lcd_e = 143
+sd_ras = 71
+lcd_d0 = 142
+sd_cas = 70
+lcd_d1 = 1
+sd_we = 69
+lcd_d2 = 144
+lcd_d3 = 3
+lcd_d4 = 2
+lcd_d5 = 10
+lcd_d6 = 7
+lcd_d7 = 11

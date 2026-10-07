@@ -1,0 +1,26 @@
+# Atajos para trabajar sin la herramienta `fpga` (la programación se hace SOLO con `fpga prog`,
+# que es la que avisa y lleva la cuenta de cargas de la flash).
+NAME = @@NAME@@
+SRC  = $(wildcard src/*.v)
+TB  ?= @@TB@@
+VVP  = sim/$(basename $(notdir $(TB))).vvp
+
+sim:
+	mkdir -p sim waves
+	iverilog -g2012 -o $(VVP) $(TB) $(SRC)
+	cd waves && vvp ../$(VVP)
+
+wave: sim
+	cd waves && gtkwave $$(ls -t *.vcd | head -1)
+
+project:
+	mkdir -p build
+	cd build && quartus_sh -t $(NAME).tcl
+
+build: project
+	cd build && quartus_sh --flow compile $(NAME)
+
+clean:
+	rm -rf sim waves build/db build/incremental_db build/output_files build/*.qpf build/*.qsf build/*.qws
+
+.PHONY: sim wave project build clean

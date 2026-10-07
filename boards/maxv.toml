@@ -1,0 +1,93 @@
+# Tarjeta MAX V (CPLD). Pines leídos del esquemático SCH_Schematic1 (diseño nuevo, documentación
+# escasa): confirma con la placa antes de fiarte de un pin.
+id = "maxv"
+name = "MAX V (CPLD)"
+family = "MAX V"
+device = "5M240ZT144C5N"      # código de pedido (el impreso en el chip y en el esquemático)
+quartus_device = "5M240ZT144C5"   # nombre que reconoce Quartus: sin la N final (empaquetado sin plomo)
+io_standard = "3.3-V LVTTL"
+default_led = "led0"
+led_active_low = false       # LED: pin -> LED -> 1k -> GND (enciende con 1)
+assignments = [               # pares ["NOMBRE", "valor"] extra para el .qsf
+  # Quartus, por defecto, deja los pines sin usar como SALIDAS a tierra: con periféricos o la cabecera de 2x40 conectados,
+  # eso es un cortocircuito en potencia. Como entrada en alta impedancia es lo seguro.
+  ["RESERVE_ALL_UNUSED_PINS", "AS INPUT TRI-STATED"],
+]
+sdc_extra = []
+
+[clock]
+mhz = 50                     # oscilador de 50 MHz en CLK1 (PIN_20)
+
+[program]
+mode = "flash_only"          # solo hay flash interna (CFM): cada carga gasta un ciclo
+file = "pof"
+limit = 100                  # ciclos garantizados (MAX V Device Handbook, grado comercial)
+warn_at = 80
+
+[pins]
+clk = 20
+led0 = 72
+led1 = 71
+led2 = 70
+led3 = 69
+led4 = 68
+led5 = 67
+led6 = 66
+led7 = 63
+led8 = 62
+led9 = 61
+sw0 = 84
+sw1 = 81
+sw2 = 80
+sw3 = 79
+sw4 = 78
+sw5 = 77
+sw6 = 76
+sw7 = 75
+sw8 = 74
+sw9 = 73
+key0 = 88
+key1 = 87
+key2 = 86
+key3 = 85
+hex_0_a = 60
+hex_0_b = 59
+hex_0_c = 58
+hex_0_d = 55
+hex_0_e = 53
+hex_0_f = 51
+hex_0_g = 52
+hex_0_dp = 57
+hex_1_a = 50
+hex_1_b = 49
+hex_1_c = 48
+hex_1_d = 44
+hex_1_e = 43
+hex_1_f = 41
+hex_1_g = 42
+hex_1_dp = 45
+hex_2_a = 31
+hex_2_b = 30
+hex_2_c = 29
+hex_2_d = 27
+hex_2_e = 24
+hex_2_f = 22
+hex_2_g = 23
+hex_2_dp = 28
+hex_3_a = 16
+hex_3_b = 15
+hex_3_c = 14
+hex_3_d = 12
+hex_3_e = 11
+hex_3_f = 6
+hex_3_g = 7
+hex_3_dp = 13
+buzzer = 95
+p1_io1 = 108
+p1_io2 = 107
+p1_io3 = 106
+p1_io4 = 105
+p1_io5 = 104
+p1_io6 = 103
+p1_io7 = 102
+p1_io8 = 101

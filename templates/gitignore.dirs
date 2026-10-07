@@ -1,0 +1,8 @@
+# Generado por la simulación y por Quartus (se recrea con `fpga sim` / `fpga build`)
+sim/
+waves/
+.fpga/
+# build/ guarda lo que genera Quartus (proyecto, db, archivos de carga y reportes); solo se conservan el .tcl y el .sdc
+build/*
+!build/*.tcl
+!build/*.sdc

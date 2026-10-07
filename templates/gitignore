@@ -1,0 +1,12 @@
+# Generado por Quartus / simulación (se recrea con `fpga build` / `fpga sim`)
+db/
+incremental_db/
+output_files/
+qdb/
+greybox_tmp/
+*.qpf
+*.qsf
+*.qws
+*.vvp
+*.vcd
+.fpga/
