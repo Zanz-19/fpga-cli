@@ -243,3 +243,7 @@ Copia `boards/maxv.toml` o `boards/cyclone4.toml`, cambia familia, dispositivo, 
 
 Recortar Quartus a un backend mínimo o contenerizarlo, programar por OpenOCD/SVF y explorar bitstreams quedan
 fuera de esta primera versión.
+
+## Licencia
+
+MIT (ver [LICENSE](LICENSE)). El logo de Pocket Labs (`assets/pocket-labs.jpeg` y el dibujo derivado en `fpga_cli/logo.py`) es una marca del autor y no queda cubierto por esa licencia.
