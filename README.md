@@ -1,15 +1,81 @@
+<p align="center">
+  <img src="assets/splash.png" alt="Pantalla de inicio de fpga-cli con el gnomo de Pocket Labs dibujado con caracteres de bloque" width="640">
+</p>
+
 # fpga-cli
 
-Flujo completo para **MAX V (CPLD)** y **Cyclone IV (FPGA)** desde la terminal, sin abrir nunca la GUI de Quartus:
-crear el proyecto, simular con testbench, ver ondas, compilar y programar.
-La herramienta vive en su propio repositorio; cada trabajo es otro repositorio aparte.
+**Quartus Prime Lite desde la terminal, con un menú TUI.** Crea el proyecto, simula con testbench, mira las ondas, compila y programa tarjetas
+**MAX V (CPLD)** y **Cyclone IV E (FPGA)** sin abrir la interfaz gráfica de Quartus.
 
+*English:* a small terminal/TUI front end for the Quartus Prime Lite flow on MAX V and Cyclone IV E boards: simulate (Icarus Verilog), view waves (GTKWave),
+build and program (Quartus), from the command line or a text menu. An experiment by Pocket Labs, MIT licensed.
+
+## Qué es y qué no es
+
+fpga-cli es un **experimento pequeño**: una capa delgada que ejecuta desde la terminal los mismos programas que Quartus ya trae
+(`quartus_sh`, `quartus_cpf` y `quartus_pgm`) y, para simular, Icarus Verilog con GTKWave. Cada paso del flujo de diseño es un comando, y un menú
+de texto (TUI) los reúne, con la salida de Quartus dentro de la misma ventana.
+
+**No busca competir con la interfaz gráfica de Quartus ni reemplazarla.** Esa herramienta cubre mucho más (IP, Platform Designer, SignalTap, Chip Planner…)
+y sigue siendo la opción para proyectos grandes. Aquí el interés es otro: explorar qué tan cómodo y reproducible puede ser el flujo de una
+FPGA o un CPLD pequeño cuando se maneja desde una terminal, con una TUI.
+
+## De dónde surge
+
+Surgió al preparar una conferencia introductoria de FPGA con demostraciones en dos tarjetas. El ciclo de editar, simular, compilar y cargar se repite
+decenas de veces, y en la interfaz gráfica implica muchas ventanas. La idea fue probar si un flujo en terminal, con comandos que se pueden repetir igual
+y un menú que muestra todo en un solo lugar, lo hacía más ágil y más fácil de explicar. Cada ejecución queda en un registro y toda opción del menú
+equivale a un comando que también se puede escribir.
+
+## Para quién es
+
+- **Estudiantes que empiezan con FPGA o CPLD** (electrónica, mecatrónica, computación) y tienen una MAX V o una Cyclone IV.
+- **Quien trabaja en Linux y prefiere la terminal.** Se desarrolló y probó solo en Linux Mint.
+- **Quien enseña o hace demostraciones:** los pasos son comandos, los proyectos tienen siempre la misma estructura y la herramienta avisa antes de gastar
+  los ciclos limitados de la flash de la MAX V.
+- **No es para** proyectos que dependan de IP de Intel o de Platform Designer, ni para otras familias de dispositivos mientras no se agregue su archivo de tarjeta
+  (ver *Añadir una tarjeta*).
+
+## Cómo funciona
+
+| Paso del flujo | Comando | Qué usa por debajo |
+|---|---|---|
+| Crear el proyecto | `fpga new`, `fpga add`, `fpga new-tb` | plantillas y asistentes |
+| Asignar pines | `fpga pin` | genera el `.tcl` y el `.sdc` |
+| Simular y ver ondas | `fpga sim`, `fpga wave` | Icarus Verilog y GTKWave |
+| Compilar | `fpga build` | `quartus_sh` |
+| Programar | `fpga prog` | `quartus_pgm` y `quartus_cpf` |
+
+Con `fpga` sin argumentos se abre el menú. Muestra el proyecto, el entorno detectado y las acciones, sugiere el siguiente paso, y cada acción corre en una
+ventana del propio menú, con la salida desplazable y el registro de la ejecución:
+
+<p align="center">
+  <img src="assets/menu.png" alt="Menú de fpga-cli con un proyecto abierto: panel del proyecto, entorno y acciones" width="760">
+</p>
+
+Dos cosas pensadas para estas tarjetas: la **MAX V** cuenta sus cargas (la flash garantiza solo 100) y exige escribir `GRABAR`; en la **Cyclone IV**,
+`fpga prog` pregunta si cargar a RAM, a flash o solo convertir, para no pisar el programa de fábrica sin querer.
+
+## Inicio rápido
+
+```bash
+git clone https://github.com/Zanz-19/fpga-cli.git && cd fpga-cli
+./install.sh udev        # enlace ~/.local/bin/fpga + regla udev del USB-Blaster
+fpga doctor              # qué herramientas encuentra y si ve el USB-Blaster
+fpga new mi-proyecto --board maxv --dir ~/proyectos    # o --board cyclone4
+cd ~/proyectos/mi-proyecto && fpga                     # abre el menú dentro del proyecto
 ```
-~/repos/
-├── fpga-cli/          # esta herramienta (boards/, templates/, fpga_cli/)
-├── blink-maxv/        # trabajo 1
-└── blink-cyclone4/    # trabajo 2
-```
+
+Faltan Quartus y las herramientas de simulación: `fpga install-quartus` y `fpga install-tools` explican cómo instalarlas (más abajo).
+
+## Cómo se hizo
+
+Autor: José Ramón Sánchez Acosta · Pocket Labs. Se desarrolló con apoyo de un asistente de IA (Claude, de Anthropic) para escribir y probar el código;
+las pruebas con las tarjetas reales las hizo el autor. Lo que está verificado y lo que no se detalla en *Estado: qué está verificado*.
+
+---
+
+# Referencia
 
 ## Requisitos
 
@@ -221,12 +287,14 @@ Es una estimación: no cuenta lo que grabes con otras herramientas. Ver o ajusta
 
 ## Estado: qué está verificado
 
+Versión 0.1.0, experimental. Probada en **Linux Mint** con **Quartus Prime Lite 25.1std (Build 1129)** y las dos tarjetas de abajo.
+
 | | |
 |---|---|
-| **Probado de punta a punta con la MAX V real** (Quartus Prime Lite 25.1std Build 1129, Linux Mint) | `fpga new` → `sim` → `wave` → `build` → `prog`: el `.tcl` generado, el nombre `5M240ZT144C5`, la restricción de reloj, los pines (reloj en el pin 20 y LED0 en el 72), `RESERVE_ALL_UNUSED_PINS`, y `quartus_pgm -m jtag -o p;archivo.pof` (borra, programa y verifica). El clon de USB-Blaster (`09fb:6001`) funciona sin sudo con la regla udev |
-| Verificado solo con un Quartus falso | La lógica de avisos, confirmación y contador (50 pruebas: `python3 -m unittest discover -s tests`); `install-tools` con un paquete falso (con el paquete real se probó la extracción) |
-| **Probado con la Cyclone IV real** | `build`, carga a RAM (`.sof`, `quartus_pgm -m jtag`: JTAG ID `0x020F10DD`, `Configuration succeeded`) y la **conversión a `.jic`** (`quartus_cpf -c -d EPCS16 -s EP4CE6`, sin errores) |
-| **Sin verificar** | **Compilar y programar desde la estructura de carpetas** con Quartus real (el `.tcl` corre dentro de `build/` y cita las fuentes como `../src/x.v`; con un Quartus falso funciona); **la flash de la Cyclone IV**: la **grabación** de la flash (`quartus_pgm -m jtag -o p;archivo.jic`; con `.pof` Quartus había rechazado el `-s`, así que se cambió a `.jic`); el instalador desatendido de `install-quartus` (la instalación se hizo con el instalador gráfico `qinst`, lanzado a mano); los switches de la MAX V |
+| **Probado con la MAX V real** | El flujo completo `fpga new` → `sim` → `wave` → `build` → `prog` desde la estructura de carpetas (`src/`, `tb/`, `build/`…): `.tcl` generado, dispositivo `5M240ZT144C5`, restricción de reloj, pines, `RESERVE_ALL_UNUSED_PINS` y `quartus_pgm -m jtag -o p;archivo.pof` (borra, programa y verifica). Dos diseños: un parpadeo y un contador de 4 dígitos con los 4 displays y las 4 teclas (37 pines, 138 de 240 LEs). El clon de USB-Blaster (`09fb:6001`) funciona sin sudo con la regla udev |
+| **Probado con la Cyclone IV real** | `build`, carga a RAM (`.sof`, `quartus_pgm -m jtag`: JTAG ID `0x020F10DD`, `Configuration succeeded`), la **conversión a `.jic`** (`quartus_cpf -c -d EPCS16 -s EP4CE6`, sin errores) y dos diseños: un parpadeo y un contador de 0 a 9 con display de 7 segmentos y botones |
+| Verificado solo con un Quartus falso | La lógica de avisos, confirmación y contador de cargas de la MAX V, los menús y los asistentes (más de 180 pruebas: `python3 -m unittest discover -s tests`); `install-tools` con un paquete falso (con el paquete real se probó la extracción) |
+| **Sin verificar** | **La grabación de la flash de la Cyclone IV** (`quartus_pgm -m jtag -o p;archivo.jic`): no se hizo a propósito, porque esa flash trae el programa de demostración de fábrica; el instalador desatendido de `install-quartus` (la instalación se hizo con el instalador gráfico `qinst`, lanzado a mano); los switches, el buzzer y la cabecera de expansión de la MAX V |
 
 Primera vez en una tarjeta nueva: `fpga doctor` → `fpga build --dry-run` → `fpga build` → `fpga prog --dry-run`.
 Los comandos de la Cyclone IV para la flash están en `boards/cyclone4.toml` (`flash_convert`, `flash_program`; con la alternativa AS comentada):
